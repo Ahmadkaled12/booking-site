@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -61,80 +60,50 @@
   <button onclick="addBooking()">احجز الآن</button>
 </div>
 
-<script type="module">
-  // Firebase
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  // 🔴 ضع بيانات Firebase هنا
-  const firebaseConfig = {
-    apiKey: "PUT_API_KEY",
-    authDomain: "PUT_AUTH_DOMAIN",
-    projectId: "PUT_PROJECT_ID",
-    storageBucket: "PUT_STORAGE_BUCKET",
-    messagingSenderId: "PUT_SENDER_ID",
-    appId: "PUT_APP_ID"
-  };
-
-  // تشغيل Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // وظيفة الحجز
-  window.addBooking = async function () {
-    const name = document.getElementById("name").value;
-    const date = document.getElementById("date").value;
-
-    if(!name || !date){
-      alert("يرجى تعبئة جميع الحقول");
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "bookings"), {
-        name: name,
-        date: date,
-        createdAt: new Date().toISOString()
-      });
-
-      alert("تم الحجز بنجاح ✅");
-
-      document.getElementById("name").value = "";
-      document.getElementById("date").value = "";
-
-    } catch (e) {
-      console.error(e);
-      alert("حدث خطأ أثناء الحجز ❌");
-    }
-  };
-</script>
-<!-- Firebase v9 compat (يعمل مباشرة بدون مشاكل على GitHub Pages) -->
+<!-- Firebase (نسخة واحدة فقط صحيحة) -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 
 <script>
-  // إعداد Firebase الخاص بك
+  // إعداد Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyCVJclfpEp9Jo9879C3RfZKiEdBUibwrxI",
     authDomain: "ahmad-662ee.firebaseapp.com",
     projectId: "ahmad-662ee",
     storageBucket: "ahmad-662ee.appspot.com",
     messagingSenderId: "740891153734",
-    appId: "1:740891153734:web:b801aee7923287ef618147",
-    measurementId: "G-D652Z4SWHL"
+    appId: "1:740891153734:web:b801aee7923287ef618147"
   };
 
   // تشغيل Firebase
   firebase.initializeApp(firebaseConfig);
-  firebase.analytics();
-
-  // تشغيل Firestore
   const db = firebase.firestore();
-  const auth = firebase.auth();
 
-  console.log("Firebase جاهز 🔥");
+  // وظيفة الحجز
+  function addBooking() {
+    const name = document.getElementById("name").value;
+    const date = document.getElementById("date").value;
+
+    if (!name || !date) {
+      alert("يرجى تعبئة جميع الحقول");
+      return;
+    }
+
+    db.collection("bookings").add({
+      name: name,
+      date: date,
+      createdAt: new Date().toISOString()
+    })
+    .then(() => {
+      alert("تم الحجز بنجاح ✅");
+      document.getElementById("name").value = "";
+      document.getElementById("date").value = "";
+    })
+    .catch((error) => {
+      alert("خطأ: " + error);
+    });
+  }
 </script>
+
 </body>
 </html>
