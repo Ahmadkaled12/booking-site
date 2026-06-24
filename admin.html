@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -17,7 +16,7 @@
       flex-direction:column;
     }
 
-    .login{
+    .box{
       background:white;
       padding:20px;
       border-radius:12px;
@@ -37,7 +36,7 @@
     button{
       width:100%;
       padding:10px;
-      background:black;
+      background:#000;
       color:white;
       border:none;
       border-radius:8px;
@@ -71,14 +70,17 @@
 
 <body>
 
-<!-- تسجيل دخول -->
-<div class="login" id="loginBox">
+<!-- Login -->
+<div class="box" id="loginBox">
   <h3>تسجيل دخول الأدمن</h3>
-  <input type="password" id="pass" placeholder="كلمة السر">
+
+  <input id="email" placeholder="الإيميل">
+  <input id="password" type="password" placeholder="كلمة المرور">
+
   <button onclick="login()">دخول</button>
 </div>
 
-<!-- لوحة التحكم -->
+<!-- Panel -->
 <div id="panel">
   <h2>📋 الحجوزات</h2>
   <div id="list"></div>
@@ -87,6 +89,7 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
 <script>
   const firebaseConfig = {
@@ -99,46 +102,50 @@
   };
 
   firebase.initializeApp(firebaseConfig);
+
   const db = firebase.firestore();
+  const auth = firebase.auth();
 
-  // كلمة السر (يمكنك تغييرها)
-  const ADMIN_PASS = "1234";
-
+  // تسجيل دخول
   function login(){
-    const pass = document.getElementById("pass").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-    if(pass === ADMIN_PASS){
-      document.getElementById("loginBox").style.display = "none";
-      document.getElementById("panel").style.display = "block";
-      load();
-    } else {
-      alert("كلمة السر خاطئة ❌");
-    }
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("panel").style.display = "block";
+        loadBookings();
+      })
+      .catch(err => {
+        alert("خطأ: " + err.message);
+      });
   }
 
-  function load(){
+  // تحميل الحجوزات
+  function loadBookings(){
     db.collection("bookings")
-    .orderBy("createdAt","desc")
-    .onSnapshot(snap=>{
-      const list = document.getElementById("list");
-      list.innerHTML = "";
+      .orderBy("createdAt","desc")
+      .onSnapshot(snapshot=>{
+        const list = document.getElementById("list");
+        list.innerHTML = "";
 
-      snap.forEach(doc=>{
-        const b = doc.data();
+        snapshot.forEach(doc=>{
+          const b = doc.data();
 
-        list.innerHTML += `
-          <div class="item">
-            👤 ${b.name}<br>
-            📅 ${b.date}<br>
-            ⏱ ${b.createdAt}
+          list.innerHTML += `
+            <div class="item">
+              👤 ${b.name}<br>
+              📅 ${b.date}<br>
+              ⏱ ${b.createdAt}
 
-            <button class="del" onclick="del('${doc.id}')">
-              حذف ❌
-            </button>
-          </div>
-        `;
+              <button class="del" onclick="del('${doc.id}')">
+                حذف ❌
+              </button>
+            </div>
+          `;
+        });
       });
-    });
   }
 
   function del(id){
