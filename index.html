@@ -64,6 +64,12 @@
       border-radius:8px;
       text-align:right;
     }
+
+    .deleteBtn{
+      background:red;
+      margin-top:8px;
+      font-size:14px;
+    }
   </style>
 </head>
 
@@ -124,7 +130,17 @@
     .catch(err => alert("خطأ: " + err));
   }
 
-  // عرض الحجوزات (Admin Panel)
+  // حذف حجز
+  function deleteBooking(id) {
+    if (!confirm("هل تريد حذف هذا الحجز؟")) return;
+
+    db.collection("bookings").doc(id).delete()
+      .then(() => {
+        alert("تم الحذف ✅");
+      });
+  }
+
+  // عرض الحجوزات
   function loadBookings() {
     db.collection("bookings")
       .orderBy("createdAt", "desc")
@@ -139,7 +155,11 @@
             <div class="item">
               👤 ${b.name}<br>
               📅 ${b.date}<br>
-              ⏱ ${b.createdAt}
+              ⏱ ${b.createdAt}<br>
+
+              <button class="deleteBtn" onclick="deleteBooking('${doc.id}')">
+                حذف ❌
+              </button>
             </div>
           `;
         });
