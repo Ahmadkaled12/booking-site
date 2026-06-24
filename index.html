@@ -108,6 +108,33 @@
     }
   };
 </script>
+<!-- Firebase v9 compat (يعمل مباشرة بدون مشاكل على GitHub Pages) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
 
+<script>
+  // إعداد Firebase الخاص بك
+  const firebaseConfig = {
+    apiKey: "AIzaSyCVJclfpEp9Jo9879C3RfZKiEdBUibwrxI",
+    authDomain: "ahmad-662ee.firebaseapp.com",
+    projectId: "ahmad-662ee",
+    storageBucket: "ahmad-662ee.appspot.com",
+    messagingSenderId: "740891153734",
+    appId: "1:740891153734:web:b801aee7923287ef618147",
+    measurementId: "G-D652Z4SWHL"
+  };
+
+  // تشغيل Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+
+  // تشغيل Firestore
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  console.log("Firebase جاهز 🔥");
+</script>
 </body>
 </html>
