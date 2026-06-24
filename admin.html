@@ -1,1 +1,152 @@
 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة الأدمن</title>
+
+  <style>
+    body{
+      font-family: Arial;
+      background:#f4f6f9;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      margin:0;
+      flex-direction:column;
+    }
+
+    .login{
+      background:white;
+      padding:20px;
+      border-radius:12px;
+      width:300px;
+      text-align:center;
+      box-shadow:0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    input{
+      width:100%;
+      padding:10px;
+      margin:10px 0;
+      border-radius:8px;
+      border:1px solid #ccc;
+    }
+
+    button{
+      width:100%;
+      padding:10px;
+      background:black;
+      color:white;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+    }
+
+    #panel{
+      display:none;
+      width:90%;
+      max-width:600px;
+    }
+
+    .item{
+      background:white;
+      margin:10px 0;
+      padding:10px;
+      border-radius:8px;
+    }
+
+    .del{
+      background:red;
+      color:white;
+      border:none;
+      padding:5px;
+      width:100%;
+      margin-top:5px;
+      border-radius:6px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- تسجيل دخول -->
+<div class="login" id="loginBox">
+  <h3>تسجيل دخول الأدمن</h3>
+  <input type="password" id="pass" placeholder="كلمة السر">
+  <button onclick="login()">دخول</button>
+</div>
+
+<!-- لوحة التحكم -->
+<div id="panel">
+  <h2>📋 الحجوزات</h2>
+  <div id="list"></div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCVJclfpEp9Jo9879C3RfZKiEdBUibwrxI",
+    authDomain: "ahmad-662ee.firebaseapp.com",
+    projectId: "ahmad-662ee",
+    storageBucket: "ahmad-662ee.appspot.com",
+    messagingSenderId: "740891153734",
+    appId: "1:740891153734:web:b801aee7923287ef618147"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // كلمة السر (يمكنك تغييرها)
+  const ADMIN_PASS = "1234";
+
+  function login(){
+    const pass = document.getElementById("pass").value;
+
+    if(pass === ADMIN_PASS){
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("panel").style.display = "block";
+      load();
+    } else {
+      alert("كلمة السر خاطئة ❌");
+    }
+  }
+
+  function load(){
+    db.collection("bookings")
+    .orderBy("createdAt","desc")
+    .onSnapshot(snap=>{
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      snap.forEach(doc=>{
+        const b = doc.data();
+
+        list.innerHTML += `
+          <div class="item">
+            👤 ${b.name}<br>
+            📅 ${b.date}<br>
+            ⏱ ${b.createdAt}
+
+            <button class="del" onclick="del('${doc.id}')">
+              حذف ❌
+            </button>
+          </div>
+        `;
+      });
+    });
+  }
+
+  function del(id){
+    if(confirm("حذف الحجز؟")){
+      db.collection("bookings").doc(id).delete();
+    }
+  }
+</script>
+
+</body>
+</html>
