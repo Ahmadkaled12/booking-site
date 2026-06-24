@@ -1,1 +1,113 @@
 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>موقع الحجز</title>
+
+  <style>
+    body{
+      font-family: Arial;
+      background:#f4f6f9;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      margin:0;
+    }
+
+    .box{
+      background:white;
+      padding:25px;
+      border-radius:12px;
+      width:300px;
+      box-shadow:0 5px 20px rgba(0,0,0,0.1);
+      text-align:center;
+    }
+
+    input{
+      width:100%;
+      padding:10px;
+      margin:10px 0;
+      border:1px solid #ccc;
+      border-radius:8px;
+    }
+
+    button{
+      width:100%;
+      padding:10px;
+      background:#28a745;
+      color:white;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:16px;
+    }
+
+    button:hover{
+      background:#218838;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>نظام الحجز</h2>
+
+  <input id="name" placeholder="الاسم الكامل">
+  <input id="date" type="date">
+
+  <button onclick="addBooking()">احجز الآن</button>
+</div>
+
+<script type="module">
+  // Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // 🔴 ضع بيانات Firebase هنا
+  const firebaseConfig = {
+    apiKey: "PUT_API_KEY",
+    authDomain: "PUT_AUTH_DOMAIN",
+    projectId: "PUT_PROJECT_ID",
+    storageBucket: "PUT_STORAGE_BUCKET",
+    messagingSenderId: "PUT_SENDER_ID",
+    appId: "PUT_APP_ID"
+  };
+
+  // تشغيل Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // وظيفة الحجز
+  window.addBooking = async function () {
+    const name = document.getElementById("name").value;
+    const date = document.getElementById("date").value;
+
+    if(!name || !date){
+      alert("يرجى تعبئة جميع الحقول");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "bookings"), {
+        name: name,
+        date: date,
+        createdAt: new Date().toISOString()
+      });
+
+      alert("تم الحجز بنجاح ✅");
+
+      document.getElementById("name").value = "";
+      document.getElementById("date").value = "";
+
+    } catch (e) {
+      console.error(e);
+      alert("حدث خطأ أثناء الحجز ❌");
+    }
+  };
+</script>
+
+</body>
+</html>
