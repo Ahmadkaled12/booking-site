@@ -9,9 +9,10 @@
       font-family: Arial;
       background:#f4f6f9;
       display:flex;
+      flex-direction:column;
       justify-content:center;
       align-items:center;
-      height:100vh;
+      min-height:100vh;
       margin:0;
     }
 
@@ -22,6 +23,7 @@
       width:300px;
       box-shadow:0 5px 20px rgba(0,0,0,0.1);
       text-align:center;
+      margin-bottom:20px;
     }
 
     input{
@@ -46,11 +48,28 @@
     button:hover{
       background:#218838;
     }
+
+    #bookingsList{
+      width:300px;
+      background:white;
+      padding:15px;
+      border-radius:12px;
+      box-shadow:0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .item{
+      background:#f1f1f1;
+      padding:10px;
+      margin:10px 0;
+      border-radius:8px;
+      text-align:right;
+    }
   </style>
 </head>
 
 <body>
 
+<!-- نموذج الحجز -->
 <div class="box">
   <h2>نظام الحجز</h2>
 
@@ -60,12 +79,16 @@
   <button onclick="addBooking()">احجز الآن</button>
 </div>
 
-<!-- Firebase (نسخة واحدة فقط صحيحة) -->
+<!-- عرض الحجوزات -->
+<div id="bookingsList">
+  <h3>📋 الحجوزات</h3>
+</div>
+
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-  // إعداد Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyCVJclfpEp9Jo9879C3RfZKiEdBUibwrxI",
     authDomain: "ahmad-662ee.firebaseapp.com",
@@ -75,11 +98,10 @@
     appId: "1:740891153734:web:b801aee7923287ef618147"
   };
 
-  // تشغيل Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // وظيفة الحجز
+  // إضافة حجز
   function addBooking() {
     const name = document.getElementById("name").value;
     const date = document.getElementById("date").value;
@@ -90,8 +112,8 @@
     }
 
     db.collection("bookings").add({
-      name: name,
-      date: date,
+      name,
+      date,
       createdAt: new Date().toISOString()
     })
     .then(() => {
@@ -99,10 +121,32 @@
       document.getElementById("name").value = "";
       document.getElementById("date").value = "";
     })
-    .catch((error) => {
-      alert("خطأ: " + error);
-    });
+    .catch(err => alert("خطأ: " + err));
   }
+
+  // عرض الحجوزات (Admin Panel)
+  function loadBookings() {
+    db.collection("bookings")
+      .orderBy("createdAt", "desc")
+      .onSnapshot(snapshot => {
+        const list = document.getElementById("bookingsList");
+        list.innerHTML = "<h3>📋 الحجوزات</h3>";
+
+        snapshot.forEach(doc => {
+          const b = doc.data();
+
+          list.innerHTML += `
+            <div class="item">
+              👤 ${b.name}<br>
+              📅 ${b.date}<br>
+              ⏱ ${b.createdAt}
+            </div>
+          `;
+        });
+      });
+  }
+
+  loadBookings();
 </script>
 
 </body>
